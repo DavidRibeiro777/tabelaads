@@ -87,7 +87,7 @@
 <div class="container">
   <header>
     <h1>Calculadora de Lucro — Mercado Livre + Ads</h1>
-    <p class="subtitle">Calcule lucro líquido, margem final e limite de ACOS (break-even e meta)</p>
+    <p class="subtitle">Calcule lucro líquido, margem final, limite de ACOS e preço de venda ideal</p>
   </header>
 
 <div class="explanation-box" style="background: linear-gradient(135deg, #e3eeff 0%, #f0f7ff 100%); border: 2px solid var(--primary); border-radius: 16px; padding: 30px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(52, 131, 250, 0.12); position: relative; overflow: hidden;">
@@ -118,9 +118,9 @@
           <span style="color: var(--primary); font-weight: bold;">✓</span>
           <span style="color: var(--dark);">Qual o máximo que você pode gastar em Ads sem perder dinheiro</span>
         </li>
-        <li style="display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: var(--warning-light); border-radius: 8px; border-left: 4px solid var(--warning);">
+        <li style="display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: #fff8e1; border-radius: 8px; border-left: 4px solid var(--warning);">
           <span style="color: var(--warning); font-weight: bold;">✓</span>
-          <span style="color: var(--dark);">Se vale a pena anunciar considerando sua meta de margem liquida</span>
+          <span style="color: var(--dark);">Qual preço de venda você precisa para alcançar sua margem líquida desejada</span>
         </li>
       </ul>
     </div>
@@ -357,43 +357,86 @@
             </div>
           </div>
           
-       <div style="display: flex; justify-content: space-between; margin-top: 20px; gap: 15px; flex-wrap: wrap;">
-  <div style="flex: 1; min-width: 120px; text-align: center; padding: 12px 8px; background: var(--light); border-radius: 8px; border-left: 4px solid var(--gray);">
-    <small style="color: var(--gray); display: block; margin-bottom: 5px;">
-      <strong>Baixa</strong>
-    </small>
-    <small style="color: var(--gray); font-weight: bold; display: block;">
-      10-15%
-    </small>
-    <small style="color: var(--gray); font-size: 0.75rem; display: block; margin-top: 4px;">
-      Produtos competitivos
-    </small>
-  </div>
-  
-  <div style="flex: 1; min-width: 120px; text-align: center; padding: 12px 8px; background: var(--light); border-radius: 8px; border-left: 4px solid var(--primary);">
-    <small style="color: var(--gray); display: block; margin-bottom: 5px;">
-      <strong>Média</strong>
-    </small>
-    <small style="color: var(--primary); font-weight: bold; display: block;">
-      15-25%
-    </small>
-    <small style="color: var(--gray); font-size: 0.75rem; display: block; margin-top: 4px;">
-      Maioria dos produtos
-    </small>
-  </div>
-  
-  <div style="flex: 1; min-width: 120px; text-align: center; padding: 12px 8px; background: var(--light); border-radius: 8px; border-left: 4px solid var(--success);">
-    <small style="color: var(--gray); display: block; margin-bottom: 5px;">
-      <strong>Alta</strong>
-    </small>
-    <small style="color: var(--success); font-weight: bold; display: block;">
-      25%+
-    </small>
-    <small style="color: var(--gray); font-size: 0.75rem; display: block; margin-top: 4px;">
-      Produtos exclusivos
-    </small>
-  </div>
-</div>
+          <div style="display: flex; justify-content: space-between; margin-top: 20px; gap: 15px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 120px; text-align: center; padding: 12px 8px; background: var(--light); border-radius: 8px; border-left: 4px solid var(--gray);">
+              <small style="color: var(--gray); display: block; margin-bottom: 5px;">
+                <strong>Baixa</strong>
+              </small>
+              <small style="color: var(--gray); font-weight: bold; display: block;">
+                10-15%
+              </small>
+              <small style="color: var(--gray); font-size: 0.75rem; display: block; margin-top: 4px;">
+                Produtos competitivos
+              </small>
+            </div>
+            
+            <div style="flex: 1; min-width: 120px; text-align: center; padding: 12px 8px; background: var(--light); border-radius: 8px; border-left: 4px solid var(--primary);">
+              <small style="color: var(--gray); display: block; margin-bottom: 5px;">
+                <strong>Média</strong>
+              </small>
+              <small style="color: var(--primary); font-weight: bold; display: block;">
+                15-25%
+              </small>
+              <small style="color: var(--gray); font-size: 0.75rem; display: block; margin-top: 4px;">
+                Maioria dos produtos
+              </small>
+            </div>
+            
+            <div style="flex: 1; min-width: 120px; text-align: center; padding: 12px 8px; background: var(--light); border-radius: 8px; border-left: 4px solid var(--success);">
+              <small style="color: var(--gray); display: block; margin-bottom: 5px;">
+                <strong>Alta</strong>
+              </small>
+              <small style="color: var(--success); font-weight: bold; display: block;">
+                25%+
+              </small>
+              <small style="color: var(--gray); font-size: 0.75rem; display: block; margin-top: 4px;">
+                Produtos exclusivos
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOVA SEÇÃO: Calculadora de Preço de Venda Ideal -->
+      <div class="card">
+        <h2 class="card-title">Calculadora de Preço de Venda Ideal</h2>
+        
+        <div class="form-group">
+          <label for="margem-liquida-desejada">Margem Líquida Desejada (%)</label>
+          <div class="input-with-info">
+            <div class="percentage-input">
+              <input type="number" id="margem-liquida-desejada" min="0" max="100" step="0.01" value="15.00">
+            </div>
+            <div class="tooltip info-icon">ℹ️
+              <span class="tooltiptext">
+                <strong>Margem líquida que você deseja obter</strong><br><br>
+                Este é o percentual de lucro que você quer ter após deduzir TODOS os custos, incluindo anúncios.<br><br>
+                <em>Exemplo: Se você quer lucrar R$ 15 em cada R$ 100 de venda, sua margem líquida desejada é 15%.</em>
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <button class="btn-primary" id="calcular-preco-ideal-btn" style="width: 100%;">
+            Calcular Preço de Venda Ideal
+          </button>
+        </div>
+        
+        <div id="resultado-preco-ideal" style="display: none; margin-top: 15px; padding: 15px; background: var(--success-light); border-radius: 6px; border-left: 4px solid var(--success);">
+          <div style="font-weight: bold; color: var(--success); margin-bottom: 10px;">
+            Preço de Venda Ideal:
+          </div>
+          <div style="font-size: 1.5rem; font-weight: bold; color: var(--success);" id="preco-ideal-valor">
+            R$ 0,00
+          </div>
+          <div style="margin-top: 10px; font-size: 0.9rem; color: var(--gray);">
+            Para alcançar <span id="margem-desejada-texto">0%</span> de margem líquida após todos os custos e anúncios
+          </div>
+          <div style="margin-top: 10px; padding: 10px; background: white; border-radius: 4px; font-size: 0.85rem;">
+            <strong>Detalhamento:</strong><br>
+            <span id="detalhes-preco-ideal"></span>
+          </div>
         </div>
       </div>
     </div>
@@ -540,6 +583,14 @@
   const acosValue = document.getElementById('acos-value');
   const metaMargemInput = document.getElementById('meta-margem');
 
+  // Nova funcionalidade: Preço de venda ideal
+  const margemLiquidaDesejadaInput = document.getElementById('margem-liquida-desejada');
+  const calcularPrecoIdealBtn = document.getElementById('calcular-preco-ideal-btn');
+  const resultadoPrecoIdeal = document.getElementById('resultado-preco-ideal');
+  const precoIdealValor = document.getElementById('preco-ideal-valor');
+  const margemDesejadaTexto = document.getElementById('margem-desejada-texto');
+  const detalhesPrecoIdeal = document.getElementById('detalhes-preco-ideal');
+
   // Resultados
   const faturamentoBrutoElement = document.getElementById('faturamento-bruto');
   const lucroAntesAdsElement = document.getElementById('lucro-antes-ads');
@@ -662,6 +713,9 @@
       calculateResults();
     });
 
+    // Nova funcionalidade: Calcular preço ideal
+    calcularPrecoIdealBtn.addEventListener('click', calcularPrecoIdeal);
+
     resetBtn.addEventListener('click', resetForm);
     shareBtn.addEventListener('click', shareResults);
     
@@ -704,6 +758,73 @@
     metaMargemInput.value = preset.metaMargem;
     
     calculateResults();
+  }
+
+  function calcularPrecoIdeal() {
+    // Obter valores atuais
+    const custoProdutoC = toCents(toFloat(custoProdutoInput));
+    const comissaoPct = toFloat(comissaoMlInput);
+    const tarifaFixaC = toCents(toFloat(tarifaFixaInput));
+    const freteVendedorC = toCents(toFloat(freteVendedorInput));
+    const impostosPct = toFloat(impostosInput);
+    const outrasDespesasC = toCents(toFloat(outrasDespesasInput));
+    const acosPct = parseFloat(acosSlider.value) || 0;
+    const margemLiquidaDesejadaPct = toFloat(margemLiquidaDesejadaInput);
+    
+    // Desconto
+    const isDescPct = document.getElementById('desconto-tipo-percentual').checked;
+    const descontoValor = toFloat(descontoInput);
+    
+    // Fórmula para calcular o preço ideal:
+    // Preço = (Custos Fixos + Custo Produto) / (1 - (Comissão% + Impostos% + ACOS% + Margem Desejada% + Desconto%))
+    
+    // Custos fixos em centavos
+    const custosFixosC = custoProdutoC + tarifaFixaC + freteVendedorC + outrasDespesasC;
+    
+    // Se desconto é percentual, adicionar à fórmula
+    const descontoPct = isDescPct ? descontoValor : 0;
+    
+    // Se desconto é em valor, adicionar aos custos fixos
+    const descontoC = isDescPct ? 0 : toCents(descontoValor);
+    
+    // Total de percentuais que serão deduzidos do preço
+    const totalPercentuais = comissaoPct + impostosPct + acosPct + margemLiquidaDesejadaPct + descontoPct;
+    
+    if (totalPercentuais >= 100) {
+      resultadoPrecoIdeal.style.display = 'block';
+      resultadoPrecoIdeal.style.background = 'var(--danger-light)';
+      resultadoPrecoIdeal.style.borderLeftColor = 'var(--danger)';
+      precoIdealValor.textContent = 'Inválido';
+      precoIdealValor.style.color = 'var(--danger)';
+      detalhesPrecoIdeal.innerHTML = 'Os percentuais totais (comissão + impostos + ACOS + margem desejada) não podem ser 100% ou mais.';
+      return;
+    }
+    
+    // Calcular preço ideal
+    const precoIdealC = Math.round((custosFixosC + descontoC) / (1 - totalPercentuais/100));
+    
+    // Exibir resultado
+    resultadoPrecoIdeal.style.display = 'block';
+    resultadoPrecoIdeal.style.background = 'var(--success-light)';
+    resultadoPrecoIdeal.style.borderLeftColor = 'var(--success)';
+    precoIdealValor.textContent = nfBRL.format(centsToR(precoIdealC));
+    precoIdealValor.style.color = 'var(--success)';
+    margemDesejadaTexto.textContent = `${margemLiquidaDesejadaPct}%`;
+    
+    // Calcular detalhes
+    const comissaoMlC = percentOfCents(precoIdealC, comissaoPct);
+    const impostosC = percentOfCents(precoIdealC, impostosPct);
+    const custoAdsC = percentOfCents(precoIdealC, acosPct);
+    const descontoCalculadoC = isDescPct ? percentOfCents(precoIdealC, descontoPct) : descontoC;
+    const lucroFinalC = precoIdealC - custosFixosC - comissaoMlC - impostosC - custoAdsC - descontoCalculadoC;
+    const margemFinalPct = (lucroFinalC / precoIdealC) * 100;
+    
+    detalhesPrecoIdeal.innerHTML = `
+      Faturamento: ${nfBRL.format(centsToR(precoIdealC))}<br>
+      Custo Total: ${nfBRL.format(centsToR(custosFixosC + comissaoMlC + impostosC + custoAdsC + descontoCalculadoC))}<br>
+      Lucro Líquido: ${nfBRL.format(centsToR(lucroFinalC))} (${margemFinalPct.toFixed(2)}%)<br>
+      <small>Este preço garante sua margem líquida desejada de ${margemLiquidaDesejadaPct}%</small>
+    `;
   }
 
   function calculateResults() {
@@ -887,6 +1008,8 @@
     acosSlider.value = '10';
     acosValue.textContent = '10%';
     metaMargemInput.value = '15.00';
+    margemLiquidaDesejadaInput.value = '15.00';
+    resultadoPrecoIdeal.style.display = 'none';
     updateDescontoInputType();
     calculateResults();
     localStorage.removeItem('mlProfitCalculator');
@@ -951,7 +1074,8 @@
       desconto: descontoInput.value,
       outrasDespesas: outrasDespesasInput.value,
       acos: acosSlider.value,
-      metaMargem: metaMargemInput.value
+      metaMargem: metaMargemInput.value,
+      margemLiquidaDesejada: margemLiquidaDesejadaInput.value
     };
     localStorage.setItem('mlProfitCalculator', JSON.stringify(data));
   }
@@ -977,6 +1101,7 @@
     acosSlider.value = d.acos ?? '10';
     acosValue.textContent = `${d.acos ?? '10'}%`;
     metaMargemInput.value = d.metaMargem ?? '15.00';
+    margemLiquidaDesejadaInput.value = d.margemLiquidaDesejada ?? '15.00';
 
     updateDescontoInputType();
   }
