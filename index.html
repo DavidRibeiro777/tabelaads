@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculadora de Lucro - Mercado Livre + Ads</title>
+  <style>
+    :root {
+      --primary: #3483fa;
+      --primary-light: #e3eeff;
+      --success: #00a650;
+      --success-light: #e6f7ef;
+      --danger: #f04449;
+      --danger-light: #fdebec;
+      --warning: #ffc107;
+      --light: #f5f5f5;
+      --dark: #333333;
+      --gray: #666666;
+      --border: #e6e6e6;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+    body{background:#f7f7f7;color:var(--dark);line-height:1.6}
+    .container{max-width:1200px;margin:0 auto;padding:20px}
+    header{text-align:center;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+    h1{color:var(--primary);margin-bottom:10px}
+    .subtitle{color:var(--gray);font-size:1.1rem}
+    .main-content{display:grid;grid-template-columns:1fr;gap:30px}
+    @media (min-width:768px){.main-content{grid-template-columns:1fr 1fr}}
+    .card{background:#fff;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.05);padding:20px;margin-bottom:20px}
+    .card-title{font-size:1.2rem;margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid var(--border);color:var(--primary)}
+    .form-group{margin-bottom:15px}
+    label{display:block;margin-bottom:5px;font-weight:500}
+    .input-with-info{display:flex;align-items:center}
+    .input-with-info input,.input-with-info select{flex:1}
+    .info-icon{margin-left:10px;color:var(--gray);cursor:help}
+    input,select{width:100%;padding:10px;border:1px solid var(--border);border-radius:4px;font-size:1rem}
+    input:focus,select:focus{outline:none;border-color:var(--primary)}
+    .percentage-input,.currency-input{position:relative}
+    .percentage-input::after,.currency-input::before{position:absolute;top:50%;transform:translateY(-50%);color:var(--gray)}
+    .percentage-input::after{content:'%';right:10px}
+    .currency-input::before{content:'R$';left:10px}
+    .percentage-input input,.currency-input input{padding-left:35px}
+    .percentage-input input{padding-right:35px}
+    .radio-group{display:flex;gap:15px;margin-top:5px}
+    .radio-option{display:flex;align-items:center}
+    .radio-option input{width:auto;margin-right:5px}
+    .slider-container{margin-top:10px}
+    .slider-value{text-align:center;font-weight:bold;margin-top:5px}
+    input[type="range"]{-webkit-appearance:none;width:100%;height:8px;border-radius:4px;background:var(--light);outline:none}
+    input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer}
+    .results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:15px;margin-bottom:20px}
+    .result-card{background:var(--light);border-radius:6px;padding:15px;text-align:center}
+    .result-value{font-size:1.5rem;font-weight:bold;margin:10px 0}
+    .positive{color:var(--success)}
+    .negative{color:var(--danger)}
+    .verdict{text-align:center;padding:15px;border-radius:6px;margin:20px 0;font-weight:bold}
+    .success{background:var(--success-light);color:var(--success);border:1px solid var(--success)}
+    .danger{background:var(--danger-light);color:var(--danger);border:1px solid var(--danger)}
+    .info{background:var(--primary-light);color:var(--primary);border:1px solid var(--primary)}
+    .sensitivity-table{width:100%;border-collapse:collapse;margin-top:20px}
+    .sensitivity-table th,.sensitivity-table td{padding:8px;text-align:center;border:1px solid var(--border)}
+    .sensitivity-table th{background:var(--light)}
+    .actions{display:flex;justify-content:space-between;margin-top:20px}
+    button{padding:10px 20px;border:none;border-radius:4px;cursor:pointer;font-weight:bold;transition:background-color .3s}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:#2968c8}
+    .btn-secondary{background:var(--light);color:var(--dark)}
+    .btn-secondary:hover{background:#e6e6e6}
+    .tooltip{position:relative;display:inline-block}
+    .tooltip .tooltiptext{visibility:hidden;width:240px;background:var(--dark);color:#fff;text-align:left;border-radius:6px;padding:10px;position:absolute;z-index:1;bottom:125%;left:50%;margin-left:-120px;opacity:0;transition:opacity .3s;font-size:.9rem;font-weight:normal}
+    .tooltip:hover .tooltiptext{visibility:visible;opacity:1}
+    .calculation-steps{margin-top:20px;padding:15px;background:#f9f9f9;border-radius:6px;border-left:4px solid var(--primary)}
+    .calculation-step{margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed var(--border)}
+    .calculation-step:last-child{margin-bottom:0;border-bottom:none}
+    .step-title{font-weight:bold;color:var(--primary)}
+    .preset-buttons{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
+    .preset-btn{padding:8px 12px;background:var(--light);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:0.9rem}
+    .preset-btn:hover{background:var(--primary-light)}
+    .explanation-box{background:var(--primary-light);padding:15px;border-radius:6px;margin-bottom:20px;border-left:4px solid var(--primary)}
+    .explanation-title{font-weight:bold;margin-bottom:10px;color:var(--primary)}
+    .meta-indicator{background:linear-gradient(135deg, var(--primary-light), #e3eeff);border:2px solid var(--primary);border-radius:8px;padding:15px;margin:10px 0;text-align:center}
+    .meta-indicator .current-meta{font-size:1.2rem;font-weight:bold;color:var(--primary);margin-bottom:5px}
+    .meta-indicator .meta-explanation{font-size:0.9rem;color:var(--gray)}
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Calculadora de Lucro — Mercado Livre + Ads</h1>
+    <p class="subtitle">Calcule lucro líquido, margem final e limite de ACOS (break-even e meta)</p>
+  </header>
+
+<div class="explanation-box" style="background: linear-gradient(135deg, #e3eeff 0%, #f0f7ff 100%); border: 2px solid var(--primary); border-radius: 16px; padding: 30px; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(52, 131, 250, 0.12); position: relative; overflow: hidden;">
+  
+  <!-- Elemento decorativo -->
+  <div style="position: absolute; top: -50px; right: -50px; width: 120px; height: 120px; background: var(--primary); opacity: 0.1; border-radius: 50%;"></div>
+  <div style="position: absolute; bottom: -30px; left: -30px; width: 80px; height: 80px; background: var(--success); opacity: 0.1; border-radius: 50%;"></div>
+  
+  <div class="explanation-title" style="display: flex; align-items: center; gap: 12px; font-size: 1.4rem; font-weight: 700; color: var(--primary); margin-bottom: 20px; position: relative; z-index: 2;">
+    <div style="background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+      📊
+    </div>
+    Como usar esta calculadora:
+  </div>
+  
+  <div style="position: relative; z-index: 2;">
+    <p style="font-size: 1.1rem; line-height: 1.7; color: var(--dark); margin-bottom: 20px; background: white; padding: 20px; border-radius: 12px; border-left: 4px solid var(--primary);">
+      Esta ferramenta ajuda você a entender se vale a pena investir em anúncios pagos (Ads) no Mercado Livre. Preencha os campos com os dados dos seus produtos e veja:
+    </p>
+    
+    <div style="background: white; padding: 25px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border);">
+      <ul style="list-style: none; padding: 0; margin: 0;">
+        <li style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 15px; padding: 12px; background: var(--success-light); border-radius: 8px; border-left: 4px solid var(--success);">
+          <span style="color: var(--success); font-weight: bold;">✓</span>
+          <span style="color: var(--dark);">Se seu produto é lucrativo mesmo sem anúncios</span>
+        </li>
+        <li style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 15px; padding: 12px; background: var(--primary-light); border-radius: 8px; border-left: 4px solid var(--primary);">
+          <span style="color: var(--primary); font-weight: bold;">✓</span>
+          <span style="color: var(--dark);">Qual o máximo que você pode gastar em Ads sem perder dinheiro</span>
+        </li>
+        <li style="display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: var(--warning-light); border-radius: 8px; border-left: 4px solid var(--warning);">
+          <span style="color: var(--warning); font-weight: bold;">✓</span>
+          <span style="color: var(--dark);">Se vale a pena anunciar considerando sua meta de margem liquida</span>
+        </li>
+      </ul>
+    </div>
+    
+  </div>
+</div>
+
+  <div class="main-content">
+    <!-- ENTRADAS -->
+    <div class="inputs-column">
+      <div class="card">
+        <h2 class="card-title">Informações do Produto</h2>
+        
+        <div class="preset-buttons">
+          <div class="preset-btn" data-preset="eletronico">📱 Eletrônico</div>
+          <div class="preset-btn" data-preset="moda">👕 Moda</div>
+          <div class="preset-btn" data-preset="casa">🏠 Casa</div>
+          <div class="preset-btn" data-preset="livro">📚 Livro</div>
+        </div>
+
+        <div class="form-group">
+          <label for="preco-venda">Preço de Venda (R$)</label>
+          <div class="input-with-info">
+            <div class="currency-input">
+              <input type="number" id="preco-venda" min="0" step="0.01" value="100.00">
+            </div>
+            <div class="tooltip info-icon">ℹ️
+              <span class="tooltiptext">
+                <strong>Preço final pago pelo comprador</strong><br><br>
+                Este é o valor que o cliente paga, já considerando qualquer desconto que você ofereceu na vitrine.<br><br>
+                <em>Exemplo: Se você vende por R$ 120, mas oferece 10% de desconto, o preço de venda é R$ 108.</em>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="custo-produto">Custo do Produto (R$)</label>
+          <div class="input-with-info">
+            <div class="currency-input">
+              <input type="number" id="custo-produto" min="0" step="0.01" value="50.00">
+            </div>
+            <div class="tooltip info-icon">ℹ️
+              <span class="tooltiptext">
+                <strong>Quanto você pagou pelo produto</strong><br><br>
+                Inclua apenas o custo de aquisição ou produção, sem taxas, impostos ou outros custos.<br><br>
+                <em>Exemplo: Se você comprou por R$ 45 e gastou R$ 5 com embalagem personalizada, o custo é R$ 50.</em>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Taxas do Mercado Livre</h2>
+
+        <div class="form-group">
+          <label for="modalidade-anuncio">Modalidade do Anúncio</label>
+          <select id="modalidade-anuncio">
+            <option value="classico">Clássico</option>
+            <option value="premium">Premium</option>
+            <option value="outro">Outro (custom)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="comissao-ml">Comissão ML (%)</label>
+          <div class="input-with-info">
+            <div class="percentage-input">
+              <input type="number" id="comissao-ml" min="0" max="100" step="0.01" value="16.00">
+            </div>
+            <div class="tooltip info-icon">ℹ️
+              <span class="tooltiptext">
+                <strong>Percentual cobrado pelo Mercado Livre</strong><br><br>
+                Esta taxa varia por categoria e pode mudar em promoções. Verifique sempre a taxa atual da sua categoria.<br><br>
+                <em>Exemplo: Eletrônicos costumam ter 16%, enquanto moda pode ter 19%.</em>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="tarifa-fixa">Tarifa Fixa por Item (R$)</label>
+          <div class="input-with-info">
+            <div class="currency-input">
+              <input type="number" id="tarifa-fixa" min="0" step="0.01" value="2.50">
+            </div>
+            <div class="tooltip info-icon">ℹ️
+              <span class="tooltiptext">
+                <strong>Taxa fixa para produtos de baixo valor</strong><br><br>
+                O ML cobra esta taxa adicional quando o preço do produto é baixo, para cobrir custos de processamento.<br><br>
+                <em>Exemplo: Para produtos abaixo de R$ 79, geralmente há uma tarifa fixa de R$ 2,50.</em>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Outros Custos</h2>
+
+        <div class="form-group">
+          <label for="frete-vendedor">Frete Suportado pelo Vendedor (R$)</label>
+          <div class="input-with-info">
+            <div class="currency-input">
+              <input type="number" id="frete-vendedor" min="0" step="0.01" value="5.00">
+            </div>
+            <div class="tooltip info-icon">ℹ️
+              <span class="tooltiptext">
+                <strong>Quanto você paga de frete</strong><br><br>
+                Quando você oferece frete grátis ou subsidia parte do custo, esse valor sai do seu lucro.<br><br>
+                <em>Exemplo: Se o frete custa R$ 15 e o cliente paga R$ 10, você subsidia R$ 5.</em>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="impostos">Impostos (% sobre receita)</label>
+          <div class="input-with-info">
+            <div class="percentage-input">
+              <input type="number" id="impostos" min="0" max="100" step="0.01" value="6.00">
+            </div>
+            <div class="tooltip info-icon">ℹ️
+              <span class="tooltiptext">
+                <strong>Percentual aproximado de impostos</strong><br><br>
+                Este valor varia conforme seu regime tributário (Simples Nacional, MEI, etc.).<br><br>
+                <em>Exemplo: No Simples Nacional para comércio, costuma ser entre 6% e 8%.</em>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Descontos e Promoções</label>
+          <div class="radio-group">
+            <div class="radio-option">
+              <input type="radio" id="desconto-tipo-percentual" name="desconto-tipo" value="%" checked>
+              <label for="desconto-tipo-percentual">%</label>
+            </div>
+            <div class="radio-option">
+              <input type="radio" id="desconto-tipo-valor" name="desconto-tipo" value="R$">
+              <label for="desconto-tipo-valor">R$</label>
+            </div>
+          </div>
+          <div class="input-with-info">
+            <div class="percentage-input" id="desconto-container">
+              <input type="number" id="desconto" min="0" step="0.01" value="0.00">
+            </div>
+            <div class="tooltip info-icon">ℹ️
+              <span class="tooltiptext">
+                <strong>Desconto que você oferece além do preço</strong><br><br>
+                Use este campo apenas se você oferece um desconto adicional além do preço já mostrado.<br><br>
+                <em>Importante: O "Preço de Venda" acima já deve ser o valor final pago pelo cliente.</em>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="outras-despesas">Outras Despesas (R$)</label>
+          <div class="input-with-info">
+            <div class="currency-input">
+              <input type="number" id="outras-despesas" min="0" step="0.01" value="2.00">
+            </div>
+            <div class="tooltip info-icon">ℹ️
+              <span class="tooltiptext">
+                <strong>Custos adicionais por venda</strong><br><br>
+                Inclua embalagem especial, etiquetas, custos de plataforma externa, etc.<br><br>
+                <em>Exemplo: Caixa personalizada R$ 1,50 + plástico-bolha R$ 0,50 = R$ 2,00.</em>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Publicidade e Meta</h2>
+
+        <div class="form-group">
+          <label for="acos">Gasto em Ads / ACOS (%)</label>
+          <div class="slider-container">
+            <input type="range" id="acos-slider" min="0" max="30" step="0.5" value="10">
+            <div class="slider-value" id="acos-value">10%</div>
+          </div>
+          <div class="tooltip info-icon">ℹ️
+            <span class="tooltiptext">
+              <strong>Quanto você gasta em anúncios em relação às vendas</strong><br><br>
+              ACOS = Advertising Cost of Sales. É a porcentagem do seu faturamento que você gasta em anúncios.<br><br>
+              <em>Exemplo: Se você vende R$ 1000 e gasta R$ 100 em anúncios, seu ACOS é 10%.</em>
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; align-items: center; margin-bottom: 8px;">
+            <span style="color: var(--primary); font-weight: bold; font-size: 1.1rem;">⭐ Meta de Lucro Líquido</span>
+            <span style="margin-left: 8px; background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;">DEPOIS do Ads</span>
+          </div>
+          
+          <div style="background: var(--primary-light); padding: 10px; border-radius: 6px; margin-bottom: 10px; border-left: 3px solid var(--primary);">
+            <small style="color: var(--dark);">
+              <strong>O que é isso?</strong> É o lucro mínimo que deve sobrar para você <strong>depois de pagar todos os custos, incluindo anúncios</strong>.
+            </small>
+          </div>
+          
+          <label for="meta-margem" style="color: var(--gray); font-size: 0.9rem;">
+            Percentual mínimo de lucro líquido:
+          </label>
+          
+          <div class="input-with-info">
+            <div class="percentage-input">
+              <input type="number" id="meta-margem" min="0" max="100" step="0.01" value="15.00">
+            </div>
+            <div class="tooltip info-icon">ℹ️
+              <span class="tooltiptext">
+                <div style="text-align: center; margin-bottom: 10px; background: var(--primary); color: white; padding: 5px; border-radius: 4px;">
+                  <strong>SEU LUCRO GARANTIDO</strong>
+                </div>
+                
+                <strong>Esta margem é calculada DEPOIS de:</strong><br>
+                ✓ Custo do produto<br>
+                ✓ Taxas do Mercado Livre<br>
+                ✓ Frete e impostos<br>
+                ✓ Descontos e embalagem<br>
+                ✓ <strong style="color: var(--primary);">CUSTO DOS ANÚNCIOS</strong><br><br>
+                
+                <strong>Exemplo prático:</strong><br>
+                Vende por R$ 100 → Quer lucrar R$ 15 líquidos<br>
+                <strong>Meta = 15%</strong><br><br>
+                
+                <strong style="color: var(--success);">💡 Dica:</strong> Comece com 15% e aumente conforme seu negócio cresce!
+              </span>
+            </div>
+          </div>
+          
+       <div style="display: flex; justify-content: space-between; margin-top: 20px; gap: 15px; flex-wrap: wrap;">
+  <div style="flex: 1; min-width: 120px; text-align: center; padding: 12px 8px; background: var(--light); border-radius: 8px; border-left: 4px solid var(--gray);">
+    <small style="color: var(--gray); display: block; margin-bottom: 5px;">
+      <strong>Baixa</strong>
+    </small>
+    <small style="color: var(--gray); font-weight: bold; display: block;">
+      10-15%
+    </small>
+    <small style="color: var(--gray); font-size: 0.75rem; display: block; margin-top: 4px;">
+      Produtos competitivos
+    </small>
+  </div>
+  
+  <div style="flex: 1; min-width: 120px; text-align: center; padding: 12px 8px; background: var(--light); border-radius: 8px; border-left: 4px solid var(--primary);">
+    <small style="color: var(--gray); display: block; margin-bottom: 5px;">
+      <strong>Média</strong>
+    </small>
+    <small style="color: var(--primary); font-weight: bold; display: block;">
+      15-25%
+    </small>
+    <small style="color: var(--gray); font-size: 0.75rem; display: block; margin-top: 4px;">
+      Maioria dos produtos
+    </small>
+  </div>
+  
+  <div style="flex: 1; min-width: 120px; text-align: center; padding: 12px 8px; background: var(--light); border-radius: 8px; border-left: 4px solid var(--success);">
+    <small style="color: var(--gray); display: block; margin-bottom: 5px;">
+      <strong>Alta</strong>
+    </small>
+    <small style="color: var(--success); font-weight: bold; display: block;">
+      25%+
+    </small>
+    <small style="color: var(--gray); font-size: 0.75rem; display: block; margin-top: 4px;">
+      Produtos exclusivos
+    </small>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div class="results-column">
+      <div class="card">
+        <h2 class="card-title">Resultados</h2>
+
+        <div class="results-grid">
+          <div class="result-card">
+            <div>Faturamento Bruto</div>
+            <div class="result-value" id="faturamento-bruto">R$ 100,00</div>
+          </div>
+
+          <div class="result-card">
+            <div>Lucro Antes de Ads</div>
+            <div class="result-value" id="lucro-antes-ads">R$ 0,00</div>
+          </div>
+
+          <div class="result-card">
+            <div>Lucro Final</div>
+            <div class="result-value positive" id="lucro-final">R$ 0,00</div>
+          </div>
+
+          <div class="result-card">
+            <div>Margem Final</div>
+            <div class="result-value positive" id="margem-final">0,00%</div>
+          </div>
+
+          <div class="result-card">
+            <div>Margem Antes Ads</div>
+            <div class="result-value positive" id="margem-antes-ads">0,00%</div>
+          </div>
+
+          <div class="result-card">
+            <div>
+              <span style="color: var(--primary); font-weight: bold;">⭐ Meta de Lucro</span>
+              <br>
+              <small style="color: var(--gray);">Sua margem mínima desejada</small>
+            </div>
+            <div class="result-value" id="meta-margem-display">15,00%</div>
+          </div>
+        </div>
+
+        <div class="meta-indicator">
+          <div class="current-meta">
+            Sua Meta: <span id="current-meta-value">15,00%</span> de lucro líquido
+          </div>
+          <div class="meta-explanation">
+            Este é o lucro mínimo que deve sobrar depois de TODOS os custos, incluindo anúncios
+          </div>
+        </div>
+
+        <div id="verdict-container" class="verdict success">
+          ✅ <strong>Vale a pena anunciar!</strong><br>
+          <small>Sua margem final está ACIMA da sua meta</small>
+        </div>
+
+        <div class="results-grid">
+          <div class="result-card">
+            <div>ACOS Break-even</div>
+            <div class="result-value" id="acos-break-even">0,00%</div>
+            <div>Ponto onde lucro final = 0</div>
+          </div>
+
+          <div class="result-card">
+            <div>ACOS Máx. para Meta</div>
+            <div class="result-value" id="acos-max-meta">0,00%</div>
+            <div>Para atingir a meta de margem</div>
+          </div>
+        </div>
+        
+        <div class="calculation-steps">
+          <div class="calculation-step">
+            <div class="step-title">Como é calculado seu lucro:</div>
+            <div id="calculation-explanation">Preencha os dados para ver o cálculo passo a passo</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Detalhamento de Custos</h2>
+
+        <div class="results-grid">
+          <div class="result-card"><div>Custo do Produto</div><div class="result-value" id="custo-produto-result">R$ 0,00</div></div>
+          <div class="result-card"><div>Comissão ML</div><div class="result-value" id="comissao-ml-result">R$ 0,00</div></div>
+          <div class="result-card"><div>Tarifa Fixa</div><div class="result-value" id="tarifa-fixa-result">R$ 0,00</div></div>
+          <div class="result-card"><div>Impostos</div><div class="result-value" id="impostos-result">R$ 0,00</div></div>
+          <div class="result-card"><div>Desconto</div><div class="result-value" id="desconto-result">R$ 0,00</div></div>
+          <div class="result-card"><div>Frete</div><div class="result-value" id="frete-result">R$ 0,00</div></div>
+          <div class="result-card"><div>Outras Despesas</div><div class="result-value" id="outras-despesas-result">R$ 0,00</div></div>
+          <div class="result-card"><div>Custo de Ads</div><div class="result-value" id="custo-ads-result">R$ 0,00</div></div>
+          <div class="result-card"><div>Custo Total</div><div class="result-value" id="custo-total-result">R$ 0,00</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Tabela de Sensibilidade</h2>
+        <p style="margin-bottom: 10px; font-size: 0.9rem; color: var(--gray);">
+          Veja como sua margem muda conforme o investimento em anúncios:
+        </p>
+        <table class="sensitivity-table">
+          <thead>
+          <tr><th>ACOS</th><th>Margem Final</th><th>Lucro Final</th></tr>
+          </thead>
+          <tbody id="sensitivity-body"></tbody>
+        </table>
+      </div>
+
+      <div class="actions">
+        <button class="btn-secondary" id="reset-btn">Limpar</button>
+        <button class="btn-primary" id="share-btn">Compartilhar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== Helpers de moeda/percentual (centavos) =====
+  const nfBRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+  const nfPct = (v) => new Intl.NumberFormat('pt-BR', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v/100);
+
+  const toFloat = (el) => parseFloat(el.value) || 0;
+  const toCents = (v) => Math.round(v * 100); // v em reais -> centavos inteiros
+  const centsToR = (c) => c / 100;
+
+  // Percentual sobre um valor em centavos -> retorna centavos (arredonda)
+  const percentOfCents = (centsBase, pct) => Math.round(centsBase * (pct / 100));
+
+  // ===== DOM =====
+  const precoVendaInput = document.getElementById('preco-venda');
+  const custoProdutoInput = document.getElementById('custo-produto');
+  const modalidadeAnuncioSelect = document.getElementById('modalidade-anuncio');
+  const comissaoMlInput = document.getElementById('comissao-ml');
+  const tarifaFixaInput = document.getElementById('tarifa-fixa');
+  const freteVendedorInput = document.getElementById('frete-vendedor');
+  const impostosInput = document.getElementById('impostos');
+  const descontoTipoRadios = document.querySelectorAll('input[name="desconto-tipo"]');
+  const descontoInput = document.getElementById('desconto');
+  const descontoContainer = document.getElementById('desconto-container');
+  const outrasDespesasInput = document.getElementById('outras-despesas');
+  const acosSlider = document.getElementById('acos-slider');
+  const acosValue = document.getElementById('acos-value');
+  const metaMargemInput = document.getElementById('meta-margem');
+
+  // Resultados
+  const faturamentoBrutoElement = document.getElementById('faturamento-bruto');
+  const lucroAntesAdsElement = document.getElementById('lucro-antes-ads');
+  const lucroFinalElement = document.getElementById('lucro-final');
+  const margemFinalElement = document.getElementById('margem-final');
+  const margemAntesAdsElement = document.getElementById('margem-antes-ads');
+  const acosBreakEvenElement = document.getElementById('acos-break-even');
+  const acosMaxMetaElement = document.getElementById('acos-max-meta');
+  const verdictContainer = document.getElementById('verdict-container');
+  const calculationExplanation = document.getElementById('calculation-explanation');
+  const metaMargemDisplay = document.getElementById('meta-margem-display');
+  const currentMetaValue = document.getElementById('current-meta-value');
+
+  // Detalhamento
+  const custoProdutoResult = document.getElementById('custo-produto-result');
+  const comissaoMlResult = document.getElementById('comissao-ml-result');
+  const tarifaFixaResult = document.getElementById('tarifa-fixa-result');
+  const impostosResult = document.getElementById('impostos-result');
+  const descontoResult = document.getElementById('desconto-result');
+  const freteResult = document.getElementById('frete-result');
+  const outrasDespesasResult = document.getElementById('outras-despesas-result');
+  const custoAdsResult = document.getElementById('custo-ads-result');
+  const custoTotalResult = document.getElementById('custo-total-result');
+
+  // Sensibilidade + ações
+  const sensitivityBody = document.getElementById('sensitivity-body');
+  const resetBtn = document.getElementById('reset-btn');
+  const shareBtn = document.getElementById('share-btn');
+
+  // Presets
+  const presetButtons = document.querySelectorAll('.preset-btn');
+
+  // Defaults por modalidade (estimativa; editável)
+  const modalidadeDefaults = {
+    classico: { comissao: 16, tarifa: 2.5 },
+    premium:  { comissao: 18, tarifa: 3.0 },
+    outro:    { comissao: 0,  tarifa: 0.0 }
+  };
+
+  // Presets para diferentes tipos de produtos
+  const productPresets = {
+    eletronico: {
+      precoVenda: 1200,
+      custoProduto: 800,
+      comissaoMl: 16,
+      tarifaFixa: 0,
+      freteVendedor: 15,
+      impostos: 6,
+      desconto: 0,
+      outrasDespesas: 5,
+      acos: 8,
+      metaMargem: 12
+    },
+    moda: {
+      precoVenda: 89,
+      custoProduto: 35,
+      comissaoMl: 19,
+      tarifaFixa: 2.5,
+      freteVendedor: 8,
+      impostos: 6,
+      desconto: 0,
+      outrasDespesas: 3,
+      acos: 12,
+      metaMargem: 20
+    },
+    casa: {
+      precoVenda: 250,
+      custoProduto: 120,
+      comissaoMl: 17,
+      tarifaFixa: 0,
+      freteVendedor: 20,
+      impostos: 6,
+      desconto: 0,
+      outrasDespesas: 8,
+      acos: 10,
+      metaMargem: 15
+    },
+    livro: {
+      precoVenda: 45,
+      custoProduto: 25,
+      comissaoMl: 16,
+      tarifaFixa: 2.5,
+      freteVendedor: 5,
+      impostos: 6,
+      desconto: 0,
+      outrasDespesas: 2,
+      acos: 15,
+      metaMargem: 10
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadFromLocalStorage();
+    setupEventListeners();
+    calculateResults();
+  });
+
+  function setupEventListeners() {
+    // inputs que recalculam
+    [
+      precoVendaInput, custoProdutoInput, comissaoMlInput, tarifaFixaInput,
+      freteVendedorInput, impostosInput, descontoInput, outrasDespesasInput,
+      metaMargemInput
+    ].forEach(input => input.addEventListener('input', calculateResults));
+
+    modalidadeAnuncioSelect.addEventListener('change', () => {
+      updateModalidadeDefaults();
+      calculateResults();
+    });
+
+    descontoTipoRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        updateDescontoInputType();
+        calculateResults();
+      });
+    });
+
+    acosSlider.addEventListener('input', function() {
+      acosValue.textContent = `${this.value}%`;
+      calculateResults();
+    });
+
+    resetBtn.addEventListener('click', resetForm);
+    shareBtn.addEventListener('click', shareResults);
+    
+    // Preset buttons
+    presetButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const preset = this.getAttribute('data-preset');
+        loadPreset(preset);
+      });
+    });
+  }
+
+  function updateModalidadeDefaults() {
+    const mod = modalidadeAnuncioSelect.value;
+    const d = modalidadeDefaults[mod];
+    comissaoMlInput.value = d.comissao;
+    tarifaFixaInput.value = d.tarifa;
+  }
+
+  function updateDescontoInputType() {
+    const isPercentual = document.getElementById('desconto-tipo-percentual').checked;
+    descontoContainer.className = isPercentual ? 'percentage-input' : 'currency-input';
+    descontoInput.placeholder = '0.00';
+  }
+
+  function loadPreset(presetName) {
+    const preset = productPresets[presetName];
+    if (!preset) return;
+    
+    precoVendaInput.value = preset.precoVenda;
+    custoProdutoInput.value = preset.custoProduto;
+    comissaoMlInput.value = preset.comissaoMl;
+    tarifaFixaInput.value = preset.tarifaFixa;
+    freteVendedorInput.value = preset.freteVendedor;
+    impostosInput.value = preset.impostos;
+    descontoInput.value = preset.desconto;
+    outrasDespesasInput.value = preset.outrasDespesas;
+    acosSlider.value = preset.acos;
+    acosValue.textContent = `${preset.acos}%`;
+    metaMargemInput.value = preset.metaMargem;
+    
+    calculateResults();
+  }
+
+  function calculateResults() {
+    // Entradas (float -> centavos)
+    const precoC = toCents(toFloat(precoVendaInput));
+    const custoProdutoC = toCents(toFloat(custoProdutoInput));
+    const comissaoPct = toFloat(comissaoMlInput);
+    const tarifaFixaC = toCents(toFloat(tarifaFixaInput));
+    const freteVendedorC = toCents(toFloat(freteVendedorInput));
+    const impostosPct = toFloat(impostosInput);
+    const outrasDespesasC = toCents(toFloat(outrasDespesasInput));
+    const acosPct = parseFloat(acosSlider.value) || 0;
+    const metaMargemPct = toFloat(metaMargemInput); // em %
+
+    // Desconto
+    const isDescPct = document.getElementById('desconto-tipo-percentual').checked;
+    const descontoValor = toFloat(descontoInput);
+    const descontoC = isDescPct ? percentOfCents(precoC, descontoValor) : toCents(descontoValor);
+
+    // Cálculos principais em centavos
+    const comissaoMlC = percentOfCents(precoC, comissaoPct);
+    const impostosC = percentOfCents(precoC, impostosPct);
+    const custoAdsC = percentOfCents(precoC, acosPct);
+
+    // Custo total (sem ads)
+    const custoTotalC = custoProdutoC + comissaoMlC + tarifaFixaC + freteVendedorC + impostosC + descontoC + outrasDespesasC;
+
+    // Lucros e margens
+    const lucroAntesAdsC = precoC - custoTotalC;
+    const margemAntesAdsPct = precoC > 0 ? (lucroAntesAdsC / precoC) * 100 : 0;
+
+    const lucroFinalC = precoC - custoTotalC - custoAdsC;
+    const margemFinalPct = precoC > 0 ? (lucroFinalC / precoC) * 100 : 0;
+
+    // ACOS: break-even e meta
+    const acosBreakEvenPct = margemAntesAdsPct;
+    const acosMaxParaMetaPct = Math.max(0, margemAntesAdsPct - metaMargemPct);
+
+    updateUI({
+      precoC, custoProdutoC, comissaoMlC, tarifaFixaC, freteVendedorC, impostosC,
+      descontoC, outrasDespesasC, custoAdsC, custoTotalC,
+      lucroAntesAdsC, margemAntesAdsPct, lucroFinalC, margemFinalPct,
+      acosBreakEvenPct, acosMaxParaMetaPct, metaMargemPct, acosPct,
+      comissaoPct, impostosPct
+    });
+
+    updateSensitivityTable(precoC, custoTotalC, metaMargemPct);
+    updateCalculationExplanation({
+      precoC, custoProdutoC, comissaoMlC, tarifaFixaC, freteVendedorC, impostosC,
+      descontoC, outrasDespesasC, custoAdsC, custoTotalC,
+      lucroAntesAdsC, margemAntesAdsPct, lucroFinalC, margemFinalPct,
+      acosBreakEvenPct, acosMaxParaMetaPct, metaMargemPct, acosPct,
+      comissaoPct, impostosPct
+    });
+    saveToLocalStorage();
+  }
+
+  function updateUI(r) {
+    // Helpers de formatação
+    const c = (cents) => nfBRL.format(centsToR(cents));
+    const p = (pct) => nfPct(pct);
+
+    // Topo
+    faturamentoBrutoElement.textContent = c(r.precoC);
+
+    lucroAntesAdsElement.textContent = c(r.lucroAntesAdsC);
+    lucroFinalElement.textContent = c(r.lucroFinalC);
+    lucroFinalElement.className = `result-value ${r.lucroFinalC >= 0 ? 'positive' : 'negative'}`;
+
+    margemFinalElement.textContent = p(r.margemFinalPct);
+    margemFinalElement.className = `result-value ${r.margemFinalPct >= 0 ? 'positive' : 'negative'}`;
+
+    margemAntesAdsElement.textContent = p(r.margemAntesAdsPct);
+    margemAntesAdsElement.className = `result-value ${r.margemAntesAdsPct >= 0 ? 'positive' : 'negative'}`;
+
+    acosBreakEvenElement.textContent = p(r.acosBreakEvenPct);
+    acosMaxMetaElement.textContent = p(r.acosMaxParaMetaPct);
+
+    // Atualizar displays da meta
+    metaMargemDisplay.textContent = p(r.metaMargemPct);
+    currentMetaValue.textContent = p(r.metaMargemPct);
+
+    const compensa = r.margemFinalPct >= r.metaMargemPct;
+    if (compensa) {
+      verdictContainer.innerHTML = `
+        ✅ <strong>Vale a pena anunciar!</strong><br>
+        <small>Sua margem final (${r.margemFinalPct.toFixed(2)}%) está ACIMA da sua meta (${r.metaMargemPct.toFixed(2)}%)</small>
+      `;
+      verdictContainer.className = 'verdict success';
+    } else {
+      verdictContainer.innerHTML = `
+        ❌ <strong>Não compensa anunciar</strong><br>
+        <small>Sua margem final (${r.margemFinalPct.toFixed(2)}%) está ABAIXO da sua meta (${r.metaMargemPct.toFixed(2)}%)</small>
+      `;
+      verdictContainer.className = 'verdict danger';
+    }
+
+    // Detalhamento
+    custoProdutoResult.textContent = c(r.custoProdutoC);
+    comissaoMlResult.textContent = c(r.comissaoMlC);
+    tarifaFixaResult.textContent = c(r.tarifaFixaC);
+    impostosResult.textContent = c(r.impostosC);
+    descontoResult.textContent = c(r.descontoC);
+    freteResult.textContent = c(r.freteVendedorC);
+    outrasDespesasResult.textContent = c(r.outrasDespesasC);
+    custoAdsResult.textContent = c(r.custoAdsC);
+    custoTotalResult.textContent = c(r.custoTotalC);
+  }
+
+  function updateCalculationExplanation(r) {
+    const c = (cents) => nfBRL.format(centsToR(cents));
+    const p = (pct) => nfPct(pct);
+    
+    let explanation = `
+      <strong>Faturamento:</strong> ${c(r.precoC)}<br>
+      <strong>- Custo do produto:</strong> ${c(r.custoProdutoC)}<br>
+      <strong>- Comissão ML (${r.comissaoPct}%):</strong> ${c(r.comissaoMlC)}<br>
+      <strong>- Tarifa fixa:</strong> ${c(r.tarifaFixaC)}<br>
+      <strong>- Frete:</strong> ${c(r.freteVendedorC)}<br>
+      <strong>- Impostos (${r.impostosPct}%):</strong> ${c(r.impostosC)}<br>
+      <strong>- Desconto:</strong> ${c(r.descontoC)}<br>
+      <strong>- Outras despesas:</strong> ${c(r.outrasDespesasC)}<br>
+      <strong>= Custo total:</strong> ${c(r.custoTotalC)}<br><br>
+      
+      <strong>Lucro antes de Ads:</strong> ${c(r.lucroAntesAdsC)} (${p(r.margemAntesAdsPct)})<br>
+      <strong>- Custo de Ads (${r.acosPct}%):</strong> ${c(r.custoAdsC)}<br>
+      <strong>= Lucro final:</strong> ${c(r.lucroFinalC)} (${p(r.margemFinalPct)})<br><br>
+      
+      <strong>ACOS break-even:</strong> ${p(r.acosBreakEvenPct)} (quando lucro final = 0)<br>
+      <strong>ACOS máximo para meta:</strong> ${p(r.acosMaxParaMetaPct)} (para atingir ${p(r.metaMargemPct)})
+    `;
+    
+    calculationExplanation.innerHTML = explanation;
+  }
+
+  function updateSensitivityTable(precoC, custoTotalC, metaMargemPct) {
+    sensitivityBody.innerHTML = '';
+    const currentAcos = parseFloat(acosSlider.value) || 0;
+
+    for (let acos = 0; acos <= 25; acos++) {
+      const custoAdsC = percentOfCents(precoC, acos);
+      const lucroFinalC = precoC - custoTotalC - custoAdsC;
+      const margemFinalPct = precoC > 0 ? (lucroFinalC / precoC) * 100 : 0;
+
+      const row = document.createElement('tr');
+
+      // Destacar linha do slider (tolerância para passos de 0.5)
+      if (Math.abs(acos - currentAcos) < 0.51) {
+        row.style.backgroundColor = 'rgba(52, 131, 250, 0.1)';
+      }
+
+      // Negrito quando bate meta (positiva)
+      if (margemFinalPct >= metaMargemPct && margemFinalPct > 0) {
+        row.style.fontWeight = 'bold';
+      }
+
+      const margemStr = `${margemFinalPct.toFixed(2)}%`;
+      const lucroStr  = nfBRL.format(centsToR(lucroFinalC));
+
+      row.innerHTML = `
+        <td>${acos}%</td>
+        <td style="color:${margemFinalPct < 0 ? '#f04449' : 'inherit'}">${margemStr}</td>
+        <td style="color:${lucroFinalC < 0 ? '#f04449' : 'inherit'}">${lucroStr}</td>
+      `;
+
+      sensitivityBody.appendChild(row);
+    }
+  }
+
+  function resetForm() {
+    precoVendaInput.value = '100.00';
+    custoProdutoInput.value = '50.00';
+    modalidadeAnuncioSelect.value = 'classico';
+    comissaoMlInput.value = '16.00';
+    tarifaFixaInput.value = '2.50';
+    freteVendedorInput.value = '5.00';
+    impostosInput.value = '6.00';
+    document.getElementById('desconto-tipo-percentual').checked = true;
+    descontoInput.value = '0.00';
+    outrasDespesasInput.value = '2.00';
+    acosSlider.value = '10';
+    acosValue.textContent = '10%';
+    metaMargemInput.value = '15.00';
+    updateDescontoInputType();
+    calculateResults();
+    localStorage.removeItem('mlProfitCalculator');
+  }
+
+  function shareResults() {
+    // Recalcular internamente (sem parse de DOM)
+    const precoC = toCents(toFloat(precoVendaInput));
+    const custoProdutoC = toCents(toFloat(custoProdutoInput));
+    const comissaoPct = toFloat(comissaoMlInput);
+    const tarifaFixaC = toCents(toFloat(tarifaFixaInput));
+    const freteVendedorC = toCents(toFloat(freteVendedorInput));
+    const impostosPct = toFloat(impostosInput);
+    const outrasDespesasC = toCents(toFloat(outrasDespesasInput));
+    const acosPct = parseFloat(acosSlider.value) || 0;
+    const metaMargemPct = toFloat(metaMargemInput);
+
+    const isDescPct = document.getElementById('desconto-tipo-percentual').checked;
+    const descontoValor = toFloat(descontoInput);
+    const descontoC = isDescPct ? percentOfCents(precoC, descontoValor) : toCents(descontoValor);
+
+    const comissaoMlC = percentOfCents(precoC, comissaoPct);
+    const impostosC = percentOfCents(precoC, impostosPct);
+    const custoAdsC = percentOfCents(precoC, acosPct);
+
+    const custoTotalC = custoProdutoC + comissaoMlC + tarifaFixaC + freteVendedorC + impostosC + descontoC + outrasDespesasC;
+    const lucroAntesAdsC = precoC - custoTotalC;
+    const margemAntesAdsPct = precoC > 0 ? (lucroAntesAdsC / precoC) * 100 : 0;
+    const lucroFinalC = precoC - custoTotalC - custoAdsC;
+    const margemFinalPct = precoC > 0 ? (lucroFinalC / precoC) * 100 : 0;
+
+    const acosBreakEvenPct = margemAntesAdsPct;
+    const acosMaxParaMetaPct = Math.max(0, margemAntesAdsPct - metaMargemPct);
+
+    const resumo = [
+      'Simulação Mercado Livre (por item):',
+      `Preço de Venda: ${nfBRL.format(centsToR(precoC))}`,
+      `Lucro Final: ${nfBRL.format(centsToR(lucroFinalC))}`,
+      `Margem Final: ${margemFinalPct.toFixed(2)}%`,
+      `ACOS: ${acosPct.toFixed(2)}%`,
+      `Meta de Margem: ${metaMargemPct.toFixed(2)}%`,
+      `Break-even ACOS: ${acosBreakEvenPct.toFixed(2)}%`,
+      `ACOS máx. p/ meta: ${acosMaxParaMetaPct.toFixed(2)}%`,
+      margemFinalPct >= metaMargemPct ? '✅ Compensa anunciar' : '❌ Não compensa anunciar'
+    ].join('\n');
+
+    navigator.clipboard.writeText(resumo)
+      .then(() => alert('Resultados copiados para a área de transferência!'))
+      .catch(() => alert('Não foi possível copiar os resultados. Tente manualmente.'));
+  }
+
+  function saveToLocalStorage() {
+    const data = {
+      precoVenda: precoVendaInput.value,
+      custoProduto: custoProdutoInput.value,
+      modalidade: modalidadeAnuncioSelect.value,
+      comissaoMl: comissaoMlInput.value,
+      tarifaFixa: tarifaFixaInput.value,
+      freteVendedor: freteVendedorInput.value,
+      impostos: impostosInput.value,
+      descontoTipo: document.querySelector('input[name="desconto-tipo"]:checked').value,
+      desconto: descontoInput.value,
+      outrasDespesas: outrasDespesasInput.value,
+      acos: acosSlider.value,
+      metaMargem: metaMargemInput.value
+    };
+    localStorage.setItem('mlProfitCalculator', JSON.stringify(data));
+  }
+
+  function loadFromLocalStorage() {
+    const saved = localStorage.getItem('mlProfitCalculator');
+    if (!saved) { updateDescontoInputType(); return; }
+
+    const d = JSON.parse(saved);
+    precoVendaInput.value = d.precoVenda ?? '100.00';
+    custoProdutoInput.value = d.custoProduto ?? '50.00';
+    modalidadeAnuncioSelect.value = d.modalidade ?? 'classico';
+    comissaoMlInput.value = d.comissaoMl ?? '16.00';
+    tarifaFixaInput.value = d.tarifaFixa ?? '2.50';
+    freteVendedorInput.value = d.freteVendedor ?? '5.00';
+    impostosInput.value = d.impostos ?? '6.00';
+
+    if (d.descontoTipo === '%') document.getElementById('desconto-tipo-percentual').checked = true;
+    else document.getElementById('desconto-tipo-valor').checked = true;
+
+    descontoInput.value = d.desconto ?? '0.00';
+    outrasDespesasInput.value = d.outrasDespesas ?? '2.00';
+    acosSlider.value = d.acos ?? '10';
+    acosValue.textContent = `${d.acos ?? '10'}%`;
+    metaMargemInput.value = d.metaMargem ?? '15.00';
+
+    updateDescontoInputType();
+  }
+</script>
+</body>
+</html>
